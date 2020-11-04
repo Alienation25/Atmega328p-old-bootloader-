@@ -31,6 +31,8 @@
 #define potentiometr A0
 
 int motorSpeed = 40; 
+int delay_position = 5000;
+
 
 void downDC(int motorSpeed,int controldelay){
      digitalWrite(AIN1, HIGH);  
@@ -38,12 +40,10 @@ void downDC(int motorSpeed,int controldelay){
      digitalWrite(BIN1, HIGH);    // крутим моторы в вниз
      digitalWrite(BIN2, LOW);
      analogWrite(PWMB, motorSpeed);
-
        digitalWrite(int1,0);
        digitalWrite(int2,1); //порт за контроль вниз
        digitalWrite(int3,0);
        digitalWrite(int4,0);
-
      delay(controldelay);
 
 }
@@ -54,50 +54,39 @@ void upDC(int motorSpeed,int controldelay){
      digitalWrite(BIN1, LOW);      
      digitalWrite(BIN2, HIGH); 
      analogWrite(PWMB, motorSpeed); 
-
        digitalWrite(int1,1);//порт за контроль вверх
        digitalWrite(int2,0);
        digitalWrite(int3,0);
        digitalWrite(int4,0);
-     
-     
      delay(controldelay);
 }
 
-void stopDC(){
-    digitalWrite(AIN1, LOW);      // крутим моторы в верх
+void stopDC(){//остановка мотора
+    digitalWrite(AIN1, LOW);   
     digitalWrite(AIN2, LOW);    
     digitalWrite(BIN1, LOW);      
     digitalWrite(BIN2, LOW); 
     analogWrite(PWMB, 255); 
 }
 
-void maxpositionINT(){// срабатывания концевика и питания по 24V
-       stopDC();
-       digitalWrite(int1,0);
-       digitalWrite(int2,0);
-       digitalWrite(int3,1);
-       digitalWrite(int4,0);
-       delay(5000);
+void maxpositionINT(){// срабатывания концевика в максимальном положении и питания по 24V
+    stopDC();
+    digitalWrite(int1,0);
+    digitalWrite(int2,0);
+    digitalWrite(int3,1);
+    digitalWrite(int4,0);
+    delay(delay_position);
 }
 
 
-void minpositionINT(){//срабатывания концевика и питания по 24V
-       stopDC();
-       digitalWrite(int1,0);//порт за контроль вверх
-       digitalWrite(int2,0);
-       digitalWrite(int3,0);
-       digitalWrite(int4,1);
-       delay(5000);
-
-
+void minpositionINT(){//срабатывания концевика в минимальном положении и питания по 24V
+     stopDC();
+     digitalWrite(int1,0);//порт за контроль вверх
+     digitalWrite(int2,0);
+     digitalWrite(int3,0);
+     digitalWrite(int4,1);
+     delay(delay_position);
 }
-
-
-
-
-
-
 
 
 
@@ -106,7 +95,7 @@ void Homepostion(){//start pos
 bool triger = 0;
  while (triger==0){
    if(digitalRead(minpos)!=0){
-      downDC(40,0);
+      downDC(motorSpeed,0);
       Serial.println("homeposition");
     }else{
       minpositionINT();
@@ -148,7 +137,7 @@ void loop() {
  stopDC();
  if (digitalRead(minpos)==0){
    for(int i=0;i<map(analogRead(potentiometr),0,1023,0,78);i++){//78 max 
-     upDC(40,100);
+     upDC(motorSpeed,100);
      Serial.println(i);
     if(digitalRead(maxpos)==0){
       maxpositionINT();
@@ -157,27 +146,6 @@ void loop() {
 
    }
    Homepostion();
- }else{
-   
  }
- 
-
-
- 
- 
-
-
-
-  
 }
 
-
-/*
-
-
- if(digitalRead(maxpos)==0){
-    downDC(40,500);
-    
- }
-
- */
